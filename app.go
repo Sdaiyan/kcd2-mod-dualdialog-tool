@@ -5,10 +5,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"unsafe"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
-	"golang.org/x/sys/windows"
 )
 
 // App struct
@@ -64,7 +62,13 @@ func (a *App) SelectGameFolder() (string, error) {
 	return folderPath, nil
 }
 
-func (a *App) CreateModZip(mainLanguage string, subLanguage string) (string, error) {
+func (a *App) CreateModZip(
+	mainLanguage string,
+	subLanguage string,
+	categories []CategoryConfig,
+	mainPatchPaths []string,
+	subPatchPaths []string,
+) (string, error) {
 	// Ask user to select output folder
 	options := runtime.OpenDialogOptions{
 		Title:                "Please select the output folder",
@@ -76,103 +80,49 @@ func (a *App) CreateModZip(mainLanguage string, subLanguage string) (string, err
 	}
 
 	// Process and export the mod zip
-	ProcessAndExportModZip(mainLanguage, subLanguage, outputFolder)
+	if err := ProcessAndExportModZip(mainLanguage, subLanguage, outputFolder, categories, mainPatchPaths, subPatchPaths); err != nil {
+		return "", err
+	}
 
 	// return zip file location and nil as error
 	return filepath.Join(outputFolder, "Dual Dialog.zip"), nil
 }
 
-// IsValidKCM2Folder checks if the given path is a valid KCM2 folder
+// GetDefaultCategories returns the built-in category configurations to the frontend.
+func (a *App) GetDefaultCategories() []CategoryConfig {
+	return DefaultCategories()
+}
+
+// SelectPatchFile opens a file-picker dialog filtered to XML files and returns the chosen path.
+func (a *App) SelectPatchFile() (string, error) {
+	options := runtime.OpenDialogOptions{
+		Title: "Select a community patch XML file",
+		Filters: []runtime.FileFilter{
+			{DisplayName: "XML Files (*.xml)", Pattern: "*.xml"},
+		},
+	}
+	path, err := runtime.OpenFileDialog(a.ctx, options)
+	if err != nil {
+		return "", err
+	}
+	return path, nil
+}
+
+// PreviewPatchFile returns the number of entries found in a patch XML file.
+func (a *App) PreviewPatchFile(xmlPath string) (int, error) {
+	return CountPatchEntries(xmlPath)
+}
+
+// IsValidKCM2Folder checks if the given path is a valid KCM2 folder.
+// It only requires a "Localization" subfolder to be present, so users
+// can test with just the language pak files without a full game install.
 func validateKCM2Folder(path string) error {
-	// Normalize the path separator
-	exePath := filepath.Join(path, "Bin", "Win64MasterMasterSteamPGO", "KingdomCome.exe")
-
-	// Check if the file exists
-	_, err := os.Stat(exePath)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return fmt.Errorf("KingdomCome.exe not found")
-		}
-		return fmt.Errorf("error checking KingdomCome.exe: %w", err)
+	localizationPath := filepath.Join(path, "Localization")
+	info, err := os.Stat(localizationPath)
+	if err != nil || !info.IsDir() {
+		return fmt.Errorf("Localization folder not found in the selected directory")
 	}
-
-	// Get file description
-	description, err := getFileDescription(exePath)
-	if err != nil {
-		return fmt.Errorf("error getting file description: %w", err)
-	}
-
-	// Check if the description matches
-	if description != "Kingdom Come: Deliverance II" {
-		return fmt.Errorf("invalid file description: %s", description)
-	}
-
 	return nil
 }
 
-// getFileDescription retrieves the description of the given executable file
-func getFileDescription(filePath string) (string, error) {
-	// Get file version info size
-	var handle windows.Handle
-	size, err := windows.GetFileVersionInfoSize(filePath, &handle)
-	if err != nil {
-		return "", fmt.Errorf("unable to get version info size: %w", err)
-	}
 
-	// Allocate buffer to store version info
-	info := make([]byte, size)
-	err = windows.GetFileVersionInfo(filePath, 0, size, unsafe.Pointer(&info[0]))
-	if err != nil {
-		return "", fmt.Errorf("unable to get version info: %w", err)
-	}
-
-	// First, get the language and code page
-	var langPtr unsafe.Pointer
-	var langLen uint32
-	err = windows.VerQueryValue(
-		unsafe.Pointer(&info[0]),
-		`\VarFileInfo\Translation`,
-		unsafe.Pointer(&langPtr),
-		&langLen,
-	)
-	if err != nil {
-		return "", fmt.Errorf("unable to query translation info: %w", err)
-	}
-
-	if langPtr == nil || langLen == 0 {
-		return "", fmt.Errorf("no translation info found")
-	}
-
-	// Extract language and code page
-	type LangCodePage struct {
-		Language uint16
-		CodePage uint16
-	}
-
-	langs := (*[100]LangCodePage)(langPtr)[:langLen/4]
-
-	// Try each available language and code page
-	for _, lang := range langs {
-		// Format the query string with the actual language and code page
-		subBlock := fmt.Sprintf("\\StringFileInfo\\%04x%04x\\FileDescription",
-			lang.Language, lang.CodePage)
-
-		var valuePtr unsafe.Pointer
-		var valueLen uint32
-
-		err = windows.VerQueryValue(
-			unsafe.Pointer(&info[0]),
-			subBlock,
-			unsafe.Pointer(&valuePtr),
-			&valueLen,
-		)
-
-		if err == nil && valuePtr != nil && valueLen > 0 {
-			// Convert UTF-16 pointer to Go string
-			fileDesc := (*[1024]uint16)(valuePtr)[:valueLen:valueLen]
-			return windows.UTF16ToString(fileDesc), nil
-		}
-	}
-
-	return "", fmt.Errorf("file description not found")
-}

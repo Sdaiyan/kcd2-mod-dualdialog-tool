@@ -1,61 +1,78 @@
 # Dual Dialog
 
-**Dual Dialog** is a mod for _Kingdom Come: Deliverance 2_ that enhances your gaming experience by displaying NPC dialogue subtitles in two languages simultaneously. Whether you want to enjoy the game in your native language while learning a second language like English, or simply prefer a bilingual setup, this mod has you covered. With **Dual Dialog**, you can see both your selected language and a secondary language (e.g., English) side by side, making it a great tool for language learners and immersive gameplay enthusiasts alike.
+**Dual Dialog** is a mod tool for _Kingdom Come: Deliverance 2_ that generates a mod displaying in-game text in two languages simultaneously. Whether you want to play in your native language while reinforcing a second language, or simply prefer a bilingual experience, this tool has you covered.
 
 _Kingdom Come: Deliverance 2_ (KCD2) is a medieval simulation game renowned for its rich dialogue and exceptional voice acting. This mod leverages that strength, turning your playthrough into an opportunity to improve your language skills while diving deep into the story.
 
-This mod is available on both [Nexus Mods](https://www.nexusmods.com/kingdomcomedeliverance2/mods/656) and [GitHub](https://github.com/SDxBacon/kcd2-mod-dualdialog-tool).
+This project is available on [GitHub](https://github.com/SDxBacon/kcd2-mod-dualdialog-tool).
+
+> 📖 [中文说明请点这里](./README_zh.md)
 
 ## Features
 
-- **Dual-Language Display**: NPC dialogues will appear in both your selected language and English.
-- **Enhanced Learning & Immersion**: Great for players who want to improve their English comprehension while enjoying the game.
-- **Support In-game Dialog**:
-  - ✅ **Overhead Dialog**
-  - ✅ **Speech Dialog**
-  - ✅ **Dialog Sequence**
+- **Dual-Language Display**: In-game text appears in both your primary language and a paired language side by side.
+- **Wide Content Coverage** — 8 bilingual categories supported:
+  - ✅ **Dialog** — Overhead, speech, and dialog sequence subtitles
+  - ✅ **Quest Journal** — Quest names and descriptions
+  - ✅ **Alchemy & Items** — Item names, descriptions, and recipe text
+  - ✅ **Skills & Buffs** — Skill names and perk descriptions
+  - ✅ **Achievements** — Achievement names and descriptions
+  - ✅ **Estate Minigame** — Minigame-related UI text
+  - ⚠️ **Menus & Codex** — Menu labels and encyclopedia entries (may have display artefacts)
+  - ⚠️ **Tutorials** — Tutorial text with UI markup (may have display artefacts)
+- **Per-Category Separator**: Choose `\n` (in-game line break) or ` / ` (inline slash) independently for each category.
+- **Community Patch Support**: Load one or more community-fix XML files (e.g. ChineseFix) for either language before generating — corrected entries take priority.
+- **No Full Game Install Required**: Only the `Localization/` folder containing the language `.pak` files is needed.
 
-![Imgur](https://imgur.com/Gq6tJIt.png)
+<!-- TODO: screenshot — tool main UI -->
 
 ## Download
-You can download **Dual Dialog** from the following platforms:
-- [Nexus Mods](https://www.nexusmods.com/kingdomcomedeliverance2/mods/656)
-- [GitHub](https://github.com/SDxBacon/kcd2-mod-dualdialog-tool/releases)
 
-## Installation
+Get the latest release from the [GitHub Releases page](https://github.com/SDxBacon/kcd2-mod-dualdialog-tool/releases).
 
-1. **Download the Mod**: Get the latest version from the *Files* section on Nexus Mods or the [GitHub release page](https://github.com/SDxBacon/kcd2-mod-dualdialog-tool/releases).
-2. **Launch the Tool**: Run the provided tool and select your game’s primary language along with the additional language you’d like to display.
-3. **Generate the Mod**: Click the "Export" button to create the *Dual Dialog* compressed file (*Dual Dialog.zip*).
-4. **Extract the Files**: Unzip the contents of *Dual Dialog.zip* into your *Kingdom Come: Deliverance 2* `Mods` folder (e.g., `C:\Program Files (x86)\Steam\steamapps\common\KingdomComeDeliverance2\Mods`). If the `Mods` folder doesn’t exist, create it manually.
-5. **Start the Game**: Launch *Kingdom Come: Deliverance 2* and enjoy NPC dialogues in both your chosen languages!
+## Usage
 
-![Imgur](https://i.imgur.com/E8MLmge.gif)
+### Basic
 
-## Suggested Language Combination
+1. **Launch the Tool** — Run `Dual Dialog Tool.exe`.
+2. **Select Game Folder** — Choose the folder that contains the `Localization/` subfolder with the language `.pak` files. This does not need to be the full game directory.
+3. **Choose Languages** — Select your primary game language and the paired language you want shown alongside.
+4. **Export** — Click **Export**, choose an output folder. The tool generates `Dual Dialog.zip`.
+5. **Install the Mod** — Extract `Dual Dialog.zip` into your KCD2 `Mods` folder (e.g. `…\KingdomComeDeliverance2\Mods`). Create the folder if it does not exist.
+6. **Launch the Game** — Enjoy bilingual text in-game!
 
-Since Kingdom Come: Deliverance 2's language files are divided into separate language packs:
-- **Latin-Based Font Pack** – Does not include any Asian language characters.
-- **Chinese Simplified Pack** – Includes Simplified Chinese and part of Latin letters.
-- **Chinese Traditional Pack** – Includes Traditional Chinese and part of Latin letters.
-- **Japanese Pack** – Includes Japanese and part of Latin letters.
-- **Korean Pack** – Includes Korean and part of Latin letters.
+<!-- TODO: GIF — basic usage workflow -->
 
-The game determines which language pack to load based on the language setting in the game options. Therefore, if the language chosen for dual subtitles is not included in the loaded language pack, it will not be displayed in the game. As a result, the following combinations are recommended:
-- Latin-based (e.g., English) → Latin-based (e.g., French) ✅ Works fine.
-- Asian-based (e.g., Chinese) → English ✅ Works fine.
-- Asian-based (e.g., Chinese) → Russian ⚠ Some characters missing.
-- Latin-based (e.g., English) → Asian-based (e.g., Chinese) ❌ Most Asian characters missing.
-- Asian-based (e.g., Simplified Chinese) → Asian-based (e.g., Japanese) ❌ Even though both are Asian languages, their fonts are not shared.
+### Advanced Settings
+
+Click **▸ Advanced Settings** in the tool to access:
+
+- **Content Categories** — Toggle each of the 8 categories on/off and set a custom separator per category.
+- **Main / Secondary Language Patches** — Add community patch XML files for either language. The tool previews how many entries each patch contains. Patched entries override the original pak data before merging.
+
+<!-- TODO: screenshot — Advanced Settings panel -->
+
+## Suggested Language Combinations
+
+KCD2 language packs bundle only the fonts needed for that script. Loading a script outside the active pack results in missing characters.
+
+| Primary Language | Paired Language | Result |
+|---|---|---|
+| Latin-based (e.g. English) | Latin-based (e.g. French) | ✅ Works fine |
+| Asian (e.g. Chinese) | Latin-based (e.g. English) | ✅ Works fine |
+| Asian (e.g. Chinese) | Russian | ⚠ Some Cyrillic characters missing |
+| Latin-based | Asian (e.g. Chinese) | ❌ Most Asian characters missing |
+| Simplified Chinese | Japanese | ❌ Fonts not shared between Asian packs |
 
 ## Feedback & Support
 
-If you encounter any issues or have suggestions, feel free to leave a comment on the mod page!
-I appreciate any feedback to improve the experience.
+If you encounter any issues or have suggestions, feel free to open an Issue on GitHub.
+All feedback is welcome!
 
 ## Enjoy your bilingual adventure with Dual Dialog! 🎮🌏
 
 ## Disclaimer
 
-- The author does understand only Chinese and English – If there are any issues with these languages, feel free to report them.
-- This mod has been tested mainly with NPC dialogues and merchant interactions – While basic conversations work, long story dialogues or cutscenes may not display correctly due to text volume.
+- The author only understands Chinese and English — if there are issues with other language combinations, please report them.
+- Categories marked ⚠️ (Menus & Codex, Tutorials) contain HTML-like markup. Results may vary; enable them only if needed.
+- This tool is provided as-is. Always back up your `Mods` folder before installing.
